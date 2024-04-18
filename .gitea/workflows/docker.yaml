@@ -3,7 +3,6 @@ name: Build & Push Docker image
 on: [ push ]
 
 env:
-  IMAGE_NAME: todoist-export
   REF: "refs/heads/main"
 
 jobs:
@@ -21,10 +20,17 @@ jobs:
           registry: https://${{ secrets.DOCKER_REGISTRY_HOST}}
           username: ${{ secrets.DOCKER_REGISTRY_USER}}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-      - name: Build and push Docker image
+      - name: Build and push web Docker image
         uses: https://github.com/docker/build-push-action@v5
         with:
           context: .
-          file: ./Dockerfile
+          file: ./web.Dockerfile
           push: true
-          tags: "${{ secrets.DOCKER_REGISTRY_HOST }}/${{ env.IMAGE_NAME }}:${{gitea.sha}},${{ secrets.DOCKER_REGISTRY_HOST }}/${{ env.IMAGE_NAME }}:latest"
+          tags: "${{ secrets.DOCKER_REGISTRY_HOST }}/todoist-export:${{gitea.sha}},${{ secrets.DOCKER_REGISTRY_HOST }}/todoist-export:latest"
+      - name: Build and push script Docker image
+        uses: https://github.com/docker/build-push-action@v5
+        with:
+          context: .
+          file: ./script.Dockerfile
+          push: true
+          tags: "${{ secrets.DOCKER_REGISTRY_HOST }}/todoist-export-script:${{gitea.sha}},${{ secrets.DOCKER_REGISTRY_HOST }}/todoist-export-script:latest"
